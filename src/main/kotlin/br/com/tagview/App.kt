@@ -2,6 +2,7 @@ package br.com.tagview
 
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11
 import java.lang.RuntimeException
 
 class App() {
@@ -43,11 +44,18 @@ class App() {
     }
 
     private fun prepare() {
-
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL)
+        GL11.glColor4f(1f, 0f, 1f, 1f)
     }
 
     private fun loop() {
+        GL11.glBegin(GL11.GL_TRIANGLES)
 
+        // By default, openGL coordinates starts at -1 and end in +1
+        GL11.glVertex2d(0.0, 0.5)
+        GL11.glVertex2d(-0.5, -0.5)
+        GL11.glVertex2d(.5, -0.5)
+        GL11.glEnd()
     }
 
     private fun finish() {

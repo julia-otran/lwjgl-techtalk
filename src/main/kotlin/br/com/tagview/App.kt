@@ -4,6 +4,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL20
 import java.lang.RuntimeException
 
 class App() {
@@ -30,6 +31,8 @@ class App() {
 
         GL.createCapabilities()
 
+        GL11.glViewport(0, 0, 1280, 720)
+
         prepare()
 
         while (!GLFW.glfwWindowShouldClose(window)) {
@@ -44,13 +47,69 @@ class App() {
         GLFW.glfwTerminate()
     }
 
-    private fun prepare() {
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL)
-        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY)
-        
-        GL11.glColor4f(1f, 0f, 1f, 1f)
+    private var vertexShader = 0
+    private var fragmentShader = 0
+    private var program = 0
 
-        val coordinatesPerVertex = 2
+    private fun prepare() {
+        val vertexShaderSrc =
+            """
+                attribute vec2 in_position;
+                varying vec2 fragment_position;
+                
+                void main(void) {
+                    gl_Position = vec4(in_position.xy, 0.0, 1.0);
+                    fragment_position = in_position;
+                }
+            """.trimIndent()
+
+        vertexShader = GL20.glCreateShader(GL20.GL_VERTEX_SHADER)
+        GL20.glShaderSource(vertexShader, vertexShaderSrc)
+        GL20.glCompileShader(vertexShader)
+
+        val vertexShaderCompileStatus = GL20.glGetShaderi(vertexShader, GL20.GL_COMPILE_STATUS)
+
+        if (vertexShaderCompileStatus == 0) {
+            print("Failed compiling vertext shader")
+            println(GL20.glGetShaderInfoLog(vertexShader))
+        }
+
+        val fragmentShaderSrc =
+            """
+                varying vec2 fragment_position;
+                
+                void main(void) {
+                    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+                }
+            """.trimIndent()
+
+        fragmentShader = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER)
+        GL20.glShaderSource(fragmentShader, fragmentShaderSrc)
+        GL20.glCompileShader(fragmentShader)
+
+        val fragmentShaderCompileStatus = GL20.glGetShaderi(fragmentShader, GL20.GL_COMPILE_STATUS)
+
+        if (fragmentShaderCompileStatus == 0) {
+            print("Failed compiling fragment shader")
+            println(GL20.glGetShaderInfoLog(fragmentShader))
+        }
+
+        program = GL20.glCreateProgram()
+        GL20.glAttachShader(program, vertexShader)
+        GL20.glAttachShader(program, fragmentShader)
+
+        GL20.glBindAttribLocation(program, 0, "in_position")
+
+        GL20.glLinkProgram(program)
+        GL20.glValidateProgram(program)
+
+        val errorCheckValue = GL11.glGetError()
+
+        if (errorCheckValue != GL11.GL_NO_ERROR) {
+            println("ERROR - Could not validate the program: $errorCheckValue")
+        }
+
+        GL20.glUseProgram(program)
 
         val coordinates = floatArrayOf(
             0f, 0.5f,
@@ -64,7 +123,10 @@ class App() {
 
         buffer.flip()
 
-        GL11.glVertexPointer(coordinatesPerVertex, GL11.GL_FLOAT, 0, buffer)
+        val totalVertex = 2
+
+        GL20.glVertexAttribPointer(0, totalVertex, GL20.GL_FLOAT, false, 0, buffer)
+        GL20.glEnableVertexAttribArray(0)
     }
 
     private fun loop() {
@@ -74,6 +136,5 @@ class App() {
     }
 
     private fun finish() {
-
     }
 }

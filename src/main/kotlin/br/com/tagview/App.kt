@@ -136,5 +136,9 @@ class App() {
     }
 
     private fun finish() {
+        GL20.glUseProgram(0)
+        GL20.glDeleteProgram(program)
+        GL20.glDeleteShader(vertexShader)
+        GL20.glDeleteShader(fragmentShader)
     }
 }

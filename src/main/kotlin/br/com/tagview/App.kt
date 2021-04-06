@@ -79,7 +79,11 @@ class App() {
                 varying vec2 fragment_position;
                 
                 void main(void) {
-                    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+                    float g = fragment_position.y + 0.5;
+                    float r = 1.0 - (fragment_position.x + 0.5) - g;
+                    float b = fragment_position.x + 0.5 - g;
+                    
+                    gl_FragColor = vec4(r, g, b, 1.0);
                 }
             """.trimIndent()
 

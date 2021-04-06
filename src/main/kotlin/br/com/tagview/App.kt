@@ -79,9 +79,20 @@ class App() {
                 varying vec2 fragment_position;
                 
                 void main(void) {
-                    float g = fragment_position.y + 0.5;
-                    float r = 1.0 - (fragment_position.x + 0.5) - g;
-                    float b = fragment_position.x + 0.5 - g;
+                    float y = (fragment_position.y + 0.5) * 9.0;
+                    
+                    float r = 0.0;
+                    float g = 0.0;
+                    float b = mod(y, 3.0) / 3.0;
+                    
+                    if (b < 0.5 && y < 4.5) {
+                        g = 1.0 - (b * 2.0);
+                        r = g * (y / 4.5);
+                    }
+                    
+                    if (b < 0.5 && y >= 4.5) {
+                        r = 1.0 - (b * 2.0);
+                    }
                     
                     gl_FragColor = vec4(r, g, b, 1.0);
                 }

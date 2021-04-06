@@ -1,5 +1,6 @@
 package br.com.tagview
 
+import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
@@ -45,17 +46,31 @@ class App() {
 
     private fun prepare() {
         GL11.glEnable(GL11.GL_COLOR_MATERIAL)
+        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY)
+        
         GL11.glColor4f(1f, 0f, 1f, 1f)
+
+        val coordinatesPerVertex = 2
+
+        val coordinates = floatArrayOf(
+            0f, 0.5f,
+            -0.5f, -0.5f,
+            0.5f, -0.5f
+        )
+
+        val buffer = BufferUtils.createFloatBuffer(coordinates.size)
+
+        coordinates.forEach { buffer.put(it) }
+
+        buffer.flip()
+
+        GL11.glVertexPointer(coordinatesPerVertex, GL11.GL_FLOAT, 0, buffer)
     }
 
     private fun loop() {
-        GL11.glBegin(GL11.GL_TRIANGLES)
-
-        // By default, openGL coordinates starts at -1 and end in +1
-        GL11.glVertex2d(0.0, 0.5)
-        GL11.glVertex2d(-0.5, -0.5)
-        GL11.glVertex2d(.5, -0.5)
-        GL11.glEnd()
+        val firstVertexIndex = 0
+        val vertexCount = 3
+        GL11.glDrawArrays(GL11.GL_TRIANGLES, firstVertexIndex, vertexCount)
     }
 
     private fun finish() {

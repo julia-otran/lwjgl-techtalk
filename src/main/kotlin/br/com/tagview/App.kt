@@ -80,11 +80,24 @@ class App() {
                 varying vec2 fragment_position;
                 
                 void main(void) {
-                    float x = fragment_position.x + 0.5;
+                    float x = (fragment_position.x + 0.5) * 9.0;
+                    float n = mod(x, 3.0);
                     
-                    float r = 0.0;
-                    float g = 0.0;
-                    float b = 0.0;
+                    float r = 0;
+                    float g = 0;
+                    float b = 0;
+                    
+                    if (n <= 1.0) {
+                        r = 1.0;
+                    }
+                    
+                    if (n > 1.0 && n <= 2.0) {
+                        g = 1.0;
+                    }
+                    
+                    if (n > 2.0) {
+                        b = 1.0;
+                    }
                     
                     gl_FragColor = vec4(r, g, b, 1.0);
                 }
